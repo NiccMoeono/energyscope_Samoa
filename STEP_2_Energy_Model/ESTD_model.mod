@@ -615,4 +615,6 @@ for {l in LAYERS}{
 		printf "%s,%s,%.2f,%s,%s,%s\n", "Wind" , "Curt.", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
 			(F["WIND_ONSHORE"]*c_p_t["WIND_ONSHORE",h,td] -  F_t["WIND_ONSHORE",h,td] + F["WIND_OFFSHORE"]*c_p_t["WIND_OFFSHORE",h,td] -  F_t["WIND_OFFSHORE",h,td])  / 1000 
 			, "Wind", "#27AE34", "TWh"  > "output/Sankey/input2sankey.csv";		
-end;  
+	}
+	
+end; 

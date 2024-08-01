@@ -91,7 +91,6 @@ DIESEL_STORAGE	0	0	0	1	0.98 	0.99 	0.99	0	0.98	 0	0	0	0
 													
 # Networks see Appendix C.3.6													
 param :	storage_charge_time	storage_discharge_time	storage_availability	storage_losses:=								
-storage_charge_time	storage_discharge_time	storage_availability storage_losses									
 BESS	 4	4	1	0.0002									
 DIESEL_STORAGE	150	150	1	0									
 ;													
@@ -99,4 +98,6 @@ DIESEL_STORAGE	150	150	1	0
 # Networks B.3.6													
 param loss_network	:=												
 ELECTRICITY	0.1												
-;													
+;					
+		
+end;

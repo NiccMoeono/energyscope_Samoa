@@ -6,6 +6,7 @@ Running the program:
 
 Run the program with
 
-`glpsol -m ESTD_model.mod -d ESTD_data.dat -d ESTD_12TD.dat -o ses_main.out` (linux)
-
-`glpsol.exe -m ESTD_model.mod -d ESTD_data.dat -d ESTD_12TD.dat -o ses_main.out` (windows)
+```cmd
+cd STEP_2_Energy_Model`
+glpsol -m ESTD_model.mod -d ESTD_data.dat -d ESTD_12TD.dat -o ses_main.out
+```

@@ -143,7 +143,7 @@ var Storage_level {STORAGE_TECH, PERIODS} >= 0; # Sto_level [GWh]: Energy stored
 subject to end_uses_t {l in LAYERS, h in HOURS, td in TYPICAL_DAYS}:
 	End_uses [l, h, td] = (if l == "ELECTRICITY" 
 		then
-			(end_uses_input[l] / total_time + end_uses_input["LIGHTING_APPLIANCES"] * electricity_time_series [h, td] / t_op [h, td] ) + Network_losses [l,h,td]) ; # For all layers which don't have an end-use demand
+			(end_uses_input[l] / total_time + end_uses_input["LIGHTING"] * electricity_time_series [h, td] / t_op [h, td] ) + Network_losses [l,h,td]) ; # For all layers which don't have an end-use demand
 
 ## Cost
 #------
@@ -259,12 +259,12 @@ subject to network_losses {eut in END_USES_TYPES, h in HOURS, td in TYPICAL_DAYS
 
 # [Eq. 2.21]  Extra grid cost for integrating 1 GW of RE is estimated to 367.8Meuros per GW of intermittent renewable (27beuros to integrate the overall potential) 
 subject to extra_grid:
-	F ["GRID"] = 1 +  (c_grid_extra / c_inv["GRID"]) *(    (F ["WIND_ONSHORE"]     + F ["WIND_OFFSHORE"]     + F ["PV"]      )
-					                                     - (f_min ["WIND_ONSHORE"] + f_min ["WIND_OFFSHORE"] + f_min ["PV"]) );
+	F ["GRID"] = 1 +  (c_grid_extra / c_inv["GRID"]) *(    (F ["WIND_ONSHORE"]      + F ["PV"]      )
+					                                     - (f_min ["WIND_ONSHORE"] + f_min ["PV"]) );
 
-# [Eq. 2.22] DHN: assigning a cost to the network equal to the power capacity connected to the grid
-subject to extra_dhn:
-	F ["DHN"] = sum {j in TECHNOLOGIES diff STORAGE_TECH: layers_in_out [j,"HEAT_LOW_T_DHN"] > 0} (layers_in_out [j,"HEAT_LOW_T_DHN"] * F [j]);
+# # [Eq. 2.22] DHN: assigning a cost to the network equal to the power capacity connected to the grid
+# subject to extra_dhn:
+# 	F ["DHN"] = sum {j in TECHNOLOGIES diff STORAGE_TECH: layers_in_out [j,"HEAT_LOW_T_DHN"] > 0} (layers_in_out [j,"HEAT_LOW_T_DHN"] * F [j]);
 	
 	
 
@@ -287,13 +287,13 @@ subject to f_max_perc {eut in END_USES_TYPES, j in TECHNOLOGIES_OF_END_USES_TYPE
 subject to f_min_perc {eut in END_USES_TYPES, j in TECHNOLOGIES_OF_END_USES_TYPE[eut]}:
 	sum {t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [j,h,td] * t_op[h,td]) >= fmin_perc [j] * sum {j2 in TECHNOLOGIES_OF_END_USES_TYPE[eut], t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]} (F_t [j2, h, td] * t_op[h,td]);
 
-# [Eq. 2.37] Energy efficiency is a fixed cost
-subject to extra_efficiency:
-	F ["EFFICIENCY"] = 1 / (1 + i_rate);	
+# # [Eq. 2.37] Energy efficiency is a fixed cost
+# subject to extra_efficiency:
+# 	F ["EFFICIENCY"] = 1 / (1 + i_rate);	
 
-# [Eq. 2.38] Limit electricity import capacity
-subject to max_elec_import {h in HOURS, td in TYPICAL_DAYS}:
-	F_t ["ELECTRICITY", h, td] * t_op [h, td] <= import_capacity; 
+# # [Eq. 2.38] Limit electricity import capacity
+# subject to max_elec_import {h in HOURS, td in TYPICAL_DAYS}:
+# 	F_t ["ELECTRICITY", h, td] * t_op [h, td] <= import_capacity; 
 	
 ##########################
 ### OBJECTIVE FUNCTION ###

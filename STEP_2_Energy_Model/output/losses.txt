@@ -1,0 +1,2 @@
+End use	Losses
+ELECTRICITY	8174.842

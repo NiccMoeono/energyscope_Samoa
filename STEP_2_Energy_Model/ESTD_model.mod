@@ -257,10 +257,10 @@ subject to limit_energy_to_power_ratio {j in STORAGE_TECH diff {"BEV_BATT","PHEV
 subject to network_losses {eut in END_USES_TYPES, h in HOURS, td in TYPICAL_DAYS}:
 	Network_losses [eut,h,td] = (sum {j in RESOURCES union TECHNOLOGIES diff STORAGE_TECH: layers_in_out [j, eut] > 0} ((layers_in_out[j, eut]) * F_t [j, h, td])) * loss_network [eut];
 
-# # [Eq. 2.21]  Extra grid cost for integrating 1 GW of RE is estimated to 367.8Meuros per GW of intermittent renewable (27beuros to integrate the overall potential) 
-# subject to extra_grid:
-# 	F ["GRID"] = 1 +  (c_grid_extra / c_inv["GRID"]) *(    (F ["WIND_ONSHORE"]     + F ["WIND_OFFSHORE"]     + F ["PV"]      )
-# 					                                     - (f_min ["WIND_ONSHORE"] + f_min ["WIND_OFFSHORE"] + f_min ["PV"]) );
+# [Eq. 2.21]  Extra grid cost for integrating 1 GW of RE is estimated to 367.8Meuros per GW of intermittent renewable (27beuros to integrate the overall potential) 
+subject to extra_grid:
+	F ["GRID"] = 1 +  (c_grid_extra / c_inv["GRID"]) *(    (F ["WIND_ONSHORE"]      + F ["PV"]      )
+					                                     - (f_min ["WIND_ONSHORE"] + f_min ["PV"]) );
 
 # # [Eq. 2.22] DHN: assigning a cost to the network equal to the power capacity connected to the grid
 # subject to extra_dhn:

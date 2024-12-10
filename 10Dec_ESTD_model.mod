@@ -464,20 +464,20 @@ for {l in LAYERS}{
       	
    	## RES_HYDRO
        for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["HYDRO_RIVER", h, td]) > 10}{
-      		printf "%s,%s,%.2f,%s,%s,%s\n", "RES_SOLAR" , "IPP_SOLAR", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in 
+      		printf "%s,%s,%.2f,%s,%s,%s\n", "RES_HYDRO" , "HYDRO_RIVER", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in 
       			TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["RES_HYDRO","HYDRO_RIVER"] * F_t ["HYDRO_RIVER", h, td]  ) / 1000 , "HYDRO_RIVER", 
       			"#FFD700", "TWh" > "output/Sankey/input2sankey.csv";
       	}      	
 
    		
 	## Electricity production
-	for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["ELECTRICITY", h, td] ) > 10 }{
-		printf "%s,%s,%.2f,%s,%s,%s\n", "Electricity" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
-            		(layers_in_out["ELECTRICITY","GRID"] * F_t ["ELECTRICITY", h, td]  ) / 1000 , 
+    for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["ELECTRICITY", h, td] ) > 10 }{
+		printf "%s,%s,%.2f,%s,%s,%s\n", "Electricity" , "Grid", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}
+            		(layers_in_out["ELECTRICITY","GRID"] * F_t ["ELECTRICITY", h, td]) / 1000 , 
 			"Electricity", "#00BFFF", "TWh" > "output/Sankey/input2sankey.csv";
 	}for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["WIND_ONSHORE", h, td] ) > 10}{
 		printf "%s,%s,%.2f,%s,%s,%s\n", "Wind" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in 
-			TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["WIND_ONSHORE","ELECTRICITY"] * F_t ["WIND_ONSHORE", h, td] * F_t ["WIND_OFFSHORE", h, td]  ) / 1000 , "Wind", "#27AE34", "TWh" 
+			TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["WIND_ONSHORE","ELECTRICITY"] * F_t ["WIND_ONSHORE", h, td] ) / 1000 , "Wind", "#27AE34", "TWh" 
 			> "output/Sankey/input2sankey.csv";
 	}for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}((F_t ["HYDRO_RIVER", h, td])  ) > 10}{
 		printf "%s,%s,%.2f,%s,%s,%s\n", "Hydro River" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in 
@@ -493,7 +493,7 @@ for {l in LAYERS}{
 			"TWh" > "output/Sankey/input2sankey.csv";
     }for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(F_t ["THERMAL", h, td] ) > 10}{
 		printf "%s,%s,%.2f,%s,%s,%s\n", "THERMAL" , "Elec", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in 
-			TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["THERMAL","ELECTRICITY"] * F_t ["THERMAL", h, td] * F_t ["THERMAL", h, td]  ) / 1000 , "Thermal", "#27AE34", "TWh" 
+			TYPICAL_DAY_OF_PERIOD[t]}(layers_in_out["THERMAL","ELECTRICITY"] * F_t ["THERMAL", h, td] ) / 1000 , "Thermal", "#27AE34", "TWh" 
 			> "output/Sankey/input2sankey.csv";			
 
 
@@ -507,7 +507,7 @@ for {l in LAYERS}{
 
 	}for{{0}: sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(End_uses ["ELECTRICITY", h, td]  ) > 10}{
 		printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Elec demand", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(End_uses 
-			["ELECTRICITY", h, td]  - Network_losses ["ELECTRICITY", h, td] - sum {i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"]} (max(Storage_out [i, "ELECTRICITY", h, td] - Storage_in [i, "ELECTRICITY", h, td],0))   
+			["LIGHTING", h, td]  - Network_losses ["ELECTRICITY", h, td] - sum {i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"]} (max(Storage_out [i, "ELECTRICITY", h, td] - Storage_in [i, "ELECTRICITY", h, td],0))   
 			)/ 1000 , "Electricity", "#00BFFF", "TWh" > "output/Sankey/input2sankey.csv";		
 	
 	#In case of curtailment ( F_t < F * c_p_t) solar & wind
@@ -521,9 +521,9 @@ for {l in LAYERS}{
 			, "Wind", "#27AE34", "TWh"  > "output/Sankey/input2sankey.csv";		
     
     # New boxes for Electricity storage
-	}for{{0}: sum{i in STORAGE_OF_END_USES_TYPES["ELECTRICITY"], t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Storage_in [i, "ELECTRICITY", h, td]) > 10}{
-		printf "%s,%s,%.2f,%s,%s,%s\n", "Elec" , "Storage", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}       (sum {i 
-			in STORAGE_OF_END_USES_TYPES["ELECTRICITY"] } max(- Storage_out [i, "ELECTRICITY", h, td] + Storage_in [i, "ELECTRICITY", h, td] ,0))/ 1000 , "Electricity", "#00BFFF", 
+	}for{{0}: sum{i in STORAGE_OF_END_USES_TYPES["BESS"], t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(Storage_in [i, "BESS", h, td]) > 10}{
+		printf "%s,%s,%.2f,%s,%s,%s\n", "BESS" , "Storage", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}       (sum {i 
+			in STORAGE_OF_END_USES_TYPES["BESS"] } max(- Storage_out [i, "ELECTRICITY", h, td] + Storage_in [i, "ELECTRICITY", h, td] ,0))/ 1000 , "Electricity", "#00BFFF", 
 			"TWh" > "output/Sankey/input2sankey.csv";
 		printf "%s,%s,%.2f,%s,%s,%s\n", "Storage" , "Elec demand", sum{t in PERIODS, h in HOUR_OF_PERIOD[t], td in TYPICAL_DAY_OF_PERIOD[t]}(sum {i 
 			in STORAGE_OF_END_USES_TYPES["ELECTRICITY"] } max(+ Storage_out [i, "ELECTRICITY", h, td] - Storage_in [i, "ELECTRICITY", h, td] ,0))/ 1000 , "Electricity", "#00BFFF", "TWh" > "output/Sankey/input2sankey.csv";

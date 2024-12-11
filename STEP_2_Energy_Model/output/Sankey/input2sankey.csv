@@ -1,1 +1,3 @@
 source,target,realValue,layerID,layerColor,layerUnit
+GRID,ELECTRICITY,60.00,ELECTRICITY,blue,GWh
+ELECTRICITY,End_uses,60.00,ELECTRICITY,red,GWh

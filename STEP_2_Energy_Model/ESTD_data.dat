@@ -1,0 +1,113 @@
+# UNIT MEASURES:												
+# Unless otherwise specified units are:												
+												
+# Energy [GWh], Power [GW], Cost [Meuros_2015], Time [h], Passenger transport [Mpkm], Freight Transport [Mtkm], CO2 [ktCO2], CO2 flow [ktCO2/h]												
+												
+# References based on Supplementary material												
+												
+# --------------------------												
+# SETS not depending on TD												
+# --------------------------												
+												
+set SECTORS := 	HOUSEHOLDS 	COMMERCIAL 	GOVT	INDUSTRY	HOTELS	;			
+set END_USES_INPUT := 	ELECTRICITY	LIGHTING	;						
+set END_USES_CATEGORIES := 	ELECTRICITY	;							
+set RESOURCES :=	RES_WIND	RES_SOLAR	RES_HYDRO	ADO	ULP	LPG	WOOD	ELECTRICITY	;
+set RES_IMPORT_CONSTANT := 	ADO	ULP	LPG	;					
+set RENEWABLE_FUELS :=	WOOD	;							
+set RE_RESOURCES :=	WOOD	;							
+									
+set END_USES_TYPES_OF_CATEGORY["ELECTRICITY"] :=	ELECTRICITY;								
+									
+set STORAGE_OF_END_USES_TYPES ["ELECTRICITY"] := 	BESS	DIESEL_STORAGE	;						
+
+set STORAGE_DAILY := 	BESS	;
+									
+set TECHNOLOGIES_OF_END_USES_TYPE["ELECTRICITY"] := 	THERMAL	IPP_SOLAR	PV	WIND_ONSHORE	HYDRO_RIVER	;			
+									
+set STORAGE_TECH :=	BESS	DIESEL_STORAGE	;						
+set INFRASTRUCTURE :=	GRID	;							
+								
+# -----------------------------												
+# PARAMETERS NOT DEPENDING ON THE NUMBER OF TYPICAL DAYS : 												
+# -----------------------------												
+												
+## PARAMETERS presented in Table 2.2												
+param i_rate := 	0.015	; 	# Appendix C.2.4									
+param re_share_primary := 	0	;	# Minimum RE share in primary consumption									
+param gwp_limit := 	55716	;	# [ktCO2-eq./year]	# yearly GWP maximum emissions								
+param solar_area :=	150	;	# [GW] Maximum power of electrical interconnections									
+param power_density_pv :=	0.2367	;	# PV :            1 kW/4.22m2   => 0.2367 kW/m2 => 0.2367 GW/km2									
+																				
+param c_grid_extra :=	250	;	# cost to reinforce the grid due to intermittent renewable energy penetration. See B.3.6									
+param import_capacity :=	0	;	# [GW] Maximum power of electrical interconnections									
+												
+# end_Uses_year see Appendix C.2.												
+param end_uses_demand_year: 	HOUSEHOLDS	COMMERCIAL	GOVT	INDUSTRY	HOTELS	:=						
+ELECTRICITY	14263	14083	12581	10256	9875							
+LIGHTING	7679	11064	14562	11851	7211							
+;												
+												
+# Link between layers  (data from Tables C.5-C.9, C.12, C.15 and C.18-21)									
+param layers_in_out:	RES_WIND	RES_SOLAR	RES_HYDRO	ADO	ULP	LPG	WOOD	ELECTRICITY	:=
+RES_WIND	1	0	0	0	0	0	0	0	
+RES_SOLAR	0	1	0	0	0	0	0	0	
+RES_HYDRO	0	0	1	0	0	0	0	0	
+ADO	0	0	0	1	0	0	0	0	
+ULP	0	0	0	0	1	0	0	0	
+LPG	0	0	0	0	0	1	0	0	
+WOOD	0	0	0	0	0	0	1	0	
+ELECTRICITY	0	0	0	0	0	0	0	1	
+THERMAL	0	0	0	-1	-1	-1	-1	1	
+IPP_SOLAR	0	-1	0	0	0	0	0	1	
+PV	0	-1	0	0	0	0	0	1	
+WIND_ONSHORE	-1	0	0	0	0	0	0	1	
+HYDRO_RIVER	0	0	-1	0	0	0	0	1	
+GRID	0	0	0	0	0	0	0	0	
+;									
+												
+# Technologies data from  (data from Tables B.5-B.9, B.11, B.14, B.16 and B.18-21)											
+param:	c_inv	c_maint	gwp_constr	lifetime	c_p	fmin_perc	fmax_perc		f_min	f_max	:=
+HYDRO_RIVER	5044.919936	50.4447982	1262.82	40	1	0	1		2	12	
+THERMAL	2516.705684	29.38376695	331.6	40	1	0	1		85	1.00E+09	
+IPP_SOLAR	870	9.935466867	2081.43	25	1	0	1		22	5.92E+01	
+PV	610	7.51	2081.43	25	1	0	1		0	50	
+WIND_ONSHORE	1040	12.096	622.85	40	1	0	1		12	1000000000	
+GRID	74919.06355	0	0	80	1	0	1		0	1000000000	
+BESS	302	0.466898841	61.3	15	1	0	1		0	65	
+DIESEL_STORAGE	0.00635	0.000397	0	20	1	0	1		12	85.5	
+;																							
+												
+# RESOURCES: Table C.2				
+param:	avail	gwp_op	c_op	:=
+RES_WIND	1000000000	0	0	
+RES_SOLAR	1000000000	0	0	
+RES_HYDRO	1000000000	0	0	
+ADO	1000000000	0.3148	0.079743788	
+ULP	1000000000	0.3448	0.082366044	
+LPG	1000000000	0.2666	0.04425306	
+WOOD	1000000000	0.0118	0.032815086	
+ELECTRICITY	1000000000	0.6679	0.08	
+;				
+												
+# Storage inlet/outlet efficiency : C.17										
+param storage_eff_in:	RES_WIND	RES_SOLAR	RES_HYDRO	ADO	ULP	LPG	WOOD	ELECTRICITY	GRID	:=
+BESS	0.99	0.98	1	0	0	0	0	1	1	
+DIESEL_STORAGE	0	0	0	1	0	0	0	1	0	
+;										
+										
+param storage_eff_out:	RES_WIND	RES_SOLAR	RES_HYDRO	ADO	ULP	LPG	WOOD	ELECTRICITY	GRID	:=
+BESS	0.96	0.995	1	0	0	0	0	1	1	
+DIESEL_STORAGE	0	0	0	1	0	0	0	1	0	
+;										
+											
+# Networks see Appendix C.3.6												
+param :	storage_charge_time	storage_discharge_time	storage_availability	storage_losses	:=							
+BESS	4	4	1	0.0002								
+DIESEL_STORAGE	150	150	1	0								
+;												
+												
+# Networks B.3.6												
+param loss_network	:=											
+ELECTRICITY	0.1											
+;												
